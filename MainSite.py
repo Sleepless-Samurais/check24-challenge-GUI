@@ -33,8 +33,8 @@ st.set_page_config(initial_sidebar_state="collapsed",layout="wide")
 st.markdown(
     """
 <style>
-    [data-testid="collapsedControl"] {
-        display: none
+    .st-emotion-cache-yfhhig.ef3psqc5 {
+        display: none;
     }
 </style>
 """,
