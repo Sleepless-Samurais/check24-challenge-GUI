@@ -1,9 +1,45 @@
 import streamlit as st
-from st_keyup import st_keyup
+from streamlit.components.v1 import html
+
+#https://github.com/streamlit/streamlit/issues/4832
+def nav_page(page_name, timeout_secs=3):
+    nav_script = """
+        <script type="text/javascript">
+            function attempt_nav_page(page_name, start_time, timeout_secs) {
+                var links = window.parent.document.getElementsByTagName("a");
+                for (var i = 0; i < links.length; i++) {
+                    if (links[i].href.toLowerCase().endsWith("/" + page_name.toLowerCase())) {
+                        links[i].click();
+                        return;
+                    }
+                }
+                var elasped = new Date() - start_time;
+                if (elasped < timeout_secs * 1000) {
+                    setTimeout(attempt_nav_page, 100, page_name, start_time, timeout_secs);
+                } else {
+                    alert("Unable to navigate to page '" + page_name + "' after " + timeout_secs + " second(s).");
+                }
+            }
+            window.addEventListener("load", function() {
+                attempt_nav_page("%s", new Date(), %d);
+            });
+        </script>
+    """ % (page_name, timeout_secs)
+    html(nav_script)
 
 
 #this is the main site of the application for the rental car GUI
-st.set_page_config(layout="wide")
+st.set_page_config(initial_sidebar_state="collapsed",layout="wide")
+st.markdown(
+    """
+<style>
+    [data-testid="collapsedControl"] {
+        display: none
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
 def main():
     st.markdown("<h1 style='text-align: center;'>Rent a Car at hackatum Check24 Challenge</h1>", unsafe_allow_html=True)
@@ -13,7 +49,7 @@ def main():
     with col1:
         st.subheader("Pick-up & Return")
         pickup_location = st.text_input("Pick-up Location","Munich")
-        return_location = st.text_input("Return Location","Munich")
+        return_location = st.text_input("Return Location","Heilbronn")
 
         
 
@@ -39,7 +75,11 @@ def main():
             sourceLongitude = 48.1351
             targetLatitude = 9.2109
             targetLongitude = 49.1427
-            pages.carVisuals.main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude)
+            #pages.carVisuals.main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude)
+
+            nav_page("carVisuals")
+    st.markdown('<style>footer{visibility: hidden;}</style>', unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     main()
