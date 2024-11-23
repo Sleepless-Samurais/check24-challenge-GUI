@@ -265,7 +265,7 @@ f"""
         # auto play mkv file:
         video_file = open('carSpinning.mp4', 'rb')
         video_bytes = video_file.read()
-        st.video(video_bytes, start_time=0, loop=True, format='video/mp4')
+        st.video(video_bytes, start_time=0, loop=True, format='video/mp4')#www.cartrade.com
         video_file.close()
         
 
