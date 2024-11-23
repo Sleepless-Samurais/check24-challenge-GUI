@@ -12,8 +12,8 @@ def main():
     col1, col2, col3 = st.columns(3)
     with col1:
         st.subheader("Pick-up & Return")
-        pickup_location = st_keyup("Pick-up Location", "Airport, city or address")
-        return_location = st_keyup("Return Location", "Airport, city or address")
+        pickup_location = st.text_input("Pick-up Location","Munich")
+        return_location = st.text_input("Return Location","Munich")
 
         
 
@@ -30,7 +30,16 @@ def main():
 
     
     if st.button("Show Cars"):
-        st.write(f"Searching cars for pick-up at {pickup_location} on {pickup_date} at {pickup_time} and return at {return_location} on {return_date} at {return_time}")
+        if pickup_location == return_location:
+            st.write(f"Searching cars for pick-up at {pickup_location} on {pickup_date} at {pickup_time} and return at {return_location} on {return_date} at {return_time}")
+        else:
+            #forwarding to carVisuals.py
+            import pages.carVisuals
+            sourceLatitude = 11.5820
+            sourceLongitude = 48.1351
+            targetLatitude = 9.2109
+            targetLongitude = 49.1427
+            pages.carVisuals.main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude)
 
 if __name__ == "__main__":
     main()
