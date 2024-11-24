@@ -225,7 +225,9 @@ with col2:
 with col3:
     st.subheader("Return Date & Time")
     return_date = st.date_input("Return Date")
-    return_time = st.time_input("Return Time")
+    import datetime
+    #set time to now + 1 hour:
+    return_time = st.time_input("Return Time",value=datetime.datetime.now() + datetime.timedelta(hours=1))
 
 if st.button("Show Cars",use_container_width=True):
     if len(selectedCities) == 2:
