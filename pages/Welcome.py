@@ -113,7 +113,20 @@ cities = {
     "Mühldorf am Inn": {"latitude": 48.2470, "longitude": 12.5221},
     "Traunreut": {"latitude": 47.9648, "longitude": 12.5997}
 }
+st.markdown("<h1 style='text-align: center;'>Rent a Car🚙 @ hackaTUM Check24 Challenge</h1>", unsafe_allow_html=True)
 
+st.markdown("""
+    <style>
+        .stMainBlockContainer {
+            margin-top: -5em;
+        }
+            .stAppHeader {visibility: hidden;}
+        #MainMenu {visibility: hidden;}
+        .stAppDeployButton {display:none;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+    </style>
+""", unsafe_allow_html=True)
 
 
 
@@ -162,11 +175,16 @@ st.markdown('<style>.mapboxgl-ctrl-bottom-right{display: none;}</style>', unsafe
 
 col1, col2 = st.columns([2, 2])
 with col1:
-    st.write("Starting City:")
-    selectedCities[0]["Capital"] if len(selectedCities) > 0 else "None"
+    
+    if len(selectedCities) > 0:
+        option = st.selectbox("🧳Select Starting City", cities["Capital"].tolist(), index=cities["Capital"].tolist().index(selectedCities[0]["Capital"]))
+    else:
+        option = st.selectbox("🧳Select Starting City", cities["Capital"].tolist(), index=0)
 with col2:
-    st.write("Destination City:")
-    selectedCities[1]["Capital"] if len(selectedCities) > 1 else "None"
+    if len(selectedCities) > 1:
+        option2 = st.selectbox("🏠Select Destination City", cities["Capital"].tolist(), index=cities["Capital"].tolist().index(selectedCities[1]["Capital"]))
+    else:
+        option2 = st.selectbox("🏠Select Destination City", cities["Capital"].tolist(), index=1)
 
 # with st.popover("View Connection"):
 #     # Define the coordinates for first two selected cities:
@@ -224,8 +242,25 @@ if st.button("Show Cars",use_container_width=True):
         st.session_state["pickup_time"] = pickup_time
         st.session_state["return_date"] = return_date
         st.session_state["return_time"] = return_time
+
+        MainSite.nav_page("carVisuals", 30)
+
+    elif option != option2:
+        st.write(f"Searching cars for pick-up at {option} and return at {option2}")
+        import MainSite
+        st.session_state["pickup_location"] = option
+        st.session_state["pickupLatitude"] = cities[cities["Capital"] == option]["Latitude"].values[0]
+        st.session_state["pickupLongitude"] = cities[cities["Capital"] == option]["Longitude"].values[0]
+        st.session_state["return_location"] = option2
+        st.session_state["returnLatitude"] = cities[cities["Capital"] == option2]["Latitude"].values[0]
+        st.session_state["returnLongitude"] = cities[cities["Capital"] == option2]["Longitude"].values[0]
         
-        MainSite.nav_page("carVisuals", 10)
+        st.session_state["pickup_date"] = pickup_date
+        st.session_state["pickup_time"] = pickup_time
+        st.session_state["return_date"] = return_date
+        st.session_state["return_time"] = return_time
+
+        MainSite.nav_page("carVisuals",30)
     else:
         st.write("Please select two cities to show cars")
 

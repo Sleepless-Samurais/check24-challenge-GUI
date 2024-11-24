@@ -1,7 +1,6 @@
 import pydeck as pdk
 import streamlit as st
 import json
-import streamlit.components.v1 as components
 
 #st.set_page_config(layout="wide",initial_sidebar_state="collapsed")
 st.markdown(
@@ -14,14 +13,29 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
+st.markdown("""
+    <style>
+        .stMainBlockContainer {
+            margin-top: -8em;
+        }
+            .stAppHeader {visibility: hidden;}
+        #MainMenu {visibility: hidden;}
+        .stAppDeployButton {display:none;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+    </style>
+""", unsafe_allow_html=True)
+
+# Add a header
+#st.header("Welcome to the Car Rental Service")
+
+
+
+# Existing markdown
+st.markdown("<h1 style='text-align: center;'>Here are your 🚙 rental details @ hackaTUM Check24 Challenge</h1>", unsafe_allow_html=True)
+
 
 def main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude,departureDate,returnDate):
-    #removing footer:
-    st.markdown('<style>footer{visibility: hidden;}</style>', unsafe_allow_html=True)
-
-    st.markdown('<style>.mapboxgl-ctrl-bottom-right{display: none;}</style>', unsafe_allow_html=True)
-
-    col1, col2, col3,col4 = st.columns([1, 10, 4,2])
     jsonFile = "testdata.json"
     tripData = None
     with open(jsonFile) as file:
@@ -45,8 +59,13 @@ def main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude,depart
         return_location = st.session_state["return_location"]
         pickup_date = st.session_state["pickup_date"]
         return_date = st.session_state["return_date"]
-        pickup_date = str(st.session_state["pickup_time"])+" "+str(pickup_date)
-        return_date = str(st.session_state["return_time"])+" "+str(return_date)
+        pickup_date = str(st.session_state["pickup_time"])[:-3]+" "+str(pickup_date)
+        return_date = str(st.session_state["return_time"])[:-3]+" "+str(return_date)
+    #set zoom level
+    zoom_level = 7
+    # Calculate the center of the source and target
+    centerLatitude = (sourceLatitude + targetLatitude) / 2
+    centerLongitude = (sourceLongitude + targetLongitude) / 2
         
 
 
@@ -67,6 +86,168 @@ def main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude,depart
     coveredDistance = tripData.get("FreeKilometers")
     leftDistance = coveredDistance - approxDistanceBetweenSourceAndTarget
     cost = tripData.get("Price")*0.01
+    #removing footer:
+    st.markdown('<style>footer{visibility: hidden;}</style>', unsafe_allow_html=True)
+
+    st.markdown('<style>.mapboxgl-ctrl-bottom-right{display: none;}</style>', unsafe_allow_html=True)
+
+    col1, col2, col3,col4 = st.columns([2, 12, 4,2])
+
+
+    with col1:
+        #get a random value for weather and delta
+        import numpy as np
+        weatherNmbr = max(0, min(9.9, 16 + 4.2 * np.random.randn()))
+        st.metric(label="Weather", value=f"{weatherNmbr:.1f} °C", delta=f"{4.2:.1f} °C",delta_color="off")
+        #making divs with class="stColumn st-emotion-cache-1r6slb0 e1f1d6gn3" have centered elements
+        
+        st.write("Recommendation(s) Based on Your Journey:")
+
+        
+        #location of Stuttgart: 48.7758° N, 9.1829° E
+        distanceToSTG = ((sourceLatitude - 9.1829)**2 + (sourceLongitude - 48.7758)**2)**0.5
+        distanceToSTG = distanceToSTG * 111.32
+        st.write(f"Distance to Stuttgart: `{distanceToSTG:.1f}` km")
+        if True:
+            with st.popover("Stuttgart"):
+                st.write("Stuttgart is the capital and largest city of the German state of Baden-Württemberg. It is located on the Neckar river in a fertile valley known as the Stuttgart Cauldron. It lies an hour from the Swabian Jura and the Black Forest. Its urban area has a population of 634,830, making it the sixth largest city in Germany.")
+                #open a popup with arc from source to Stuttgart
+
+                #Define the data for the ArcLayer
+                arc_data = [
+                    {
+                        "sourcePosition": [sourceLatitude, sourceLongitude],  # Starting point (latitude, longitude)
+                        "targetPosition": [9.1829, 48.7758],  # Ending point (latitude, longitude)
+                        "height": 0.25  # Height of the arc
+                    },
+                    {
+                        "sourcePosition": [9.1829, 48.7758],  # Starting point (Stuttgart)
+                        "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
+                        "height": 0.25  # Height of the arc
+                    }
+                ]
+                # Create the pydeck chart with the ArcLayer
+                st.pydeck_chart(
+                    pdk.Deck(
+                        map_style=None,
+                        initial_view_state=pdk.ViewState(
+                            latitude=centerLongitude,
+                            longitude=centerLatitude,
+                            zoom=zoom_level,  # Set the zoom level here
+                            pitch=50,
+                        ),
+                        layers=[
+                            pdk.Layer(
+                                "ArcLayer",
+                                data=arc_data,
+                                get_source_position="sourcePosition",
+                                get_target_position="targetPosition",
+                                get_source_color=[0, 255, 30, 100],  # Green color for the source
+                                get_target_color=[255, 30, 30, 140],  # Red color for the target
+                                get_width=5,
+                                get_height="height",  # Set the height of the arc
+                            ),
+                        ],
+                    ),
+                    use_container_width=True
+                )
+
+            #location of Nuremberg: 49.4520° N, 11.0768° E
+            distanceToNUE = ((sourceLatitude - 11.0768)**2 + (sourceLongitude - 49.4520)**2)**0.5
+            distanceToNUE = distanceToNUE * 111.32
+            st.write(f"Distance to Nuremberg: `{distanceToNUE:.1f}` km")
+            if True:
+                with st.popover("Nuremberg"):
+                    st.write("Nuremberg is the second-largest city of the German federal state of Bavaria after its capital Munich, and its 518,370 (2019) inhabitants make it the 14th largest city in Germany. On the Pegnitz River (from its confluence with the Rednitz in Fürth onwards: Regnitz, a tributary of the River Main), it lies in the Rhine-Main-Danube Region and is the largest city in Franconia.")
+                    #open a popup with arc from source to Nuremberg
+
+                    #Define the data for the ArcLayer
+                    arc_data = [
+                        {
+                            "sourcePosition": [sourceLatitude, sourceLongitude],  # Starting point (latitude, longitude)
+                            "targetPosition": [11.0768, 49.4520],  # Ending point (latitude, longitude)
+                            "height": 0.25  # Height of the arc
+                        },
+                        {
+                            "sourcePosition": [11.0768, 49.4520],  # Starting point (Nuremberg)
+                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
+                            "height": 0.25  # Height of the arc
+                        }
+                    ]
+                    # Create the pydeck chart with the ArcLayer
+                    st.pydeck_chart(
+                        pdk.Deck(
+                            map_style=None,
+                            initial_view_state=pdk.ViewState(
+                                latitude=centerLongitude,
+                                longitude=centerLatitude,
+                                zoom=zoom_level,  # Set the zoom level here
+                                pitch=50,
+                            ),
+                            layers=[
+                                pdk.Layer(
+                                    "ArcLayer",
+                                    data=arc_data,
+                                    get_source_position="sourcePosition",
+                                    get_target_position="targetPosition",
+                                    get_source_color=[0, 255, 30, 100],  # Green color for the source
+                                    get_target_color=[255, 30, 30, 140],  # Red color for the target
+                                    get_width=5,
+                                    get_height="height",  # Set the height of the arc
+                                ),
+                            ],
+                        ),
+                        use_container_width=True
+                    )
+        #now Ulm: 48.4011° N, 9.9876° E
+            distanceToULM = ((sourceLatitude - 9.9876)**2 + (sourceLongitude - 48.4011)**2)**0.5
+            distanceToULM = distanceToULM * 111.32
+            st.write(f"Distance to Ulm: `{distanceToULM:.1f}` km")
+            if True:
+                with st.popover("Ulm"):
+                    st.write("Ulm is a city in the federal German state of Baden-Württemberg, situated on the River Danube. The city, whose population is estimated at 126,000 (2016), forms an urban district of its own (German: Stadtkreis) and is the administrative seat of the Alb-Donau district. Ulm, founded around 850, is rich in history and traditions as a former free imperial city (German: freie Reichsstadt).")
+                    #open a popup with arc from source to Ulm
+
+                    #Define the data for the ArcLayer
+                    arc_data = [
+                        {
+                            "sourcePosition": [sourceLatitude, sourceLongitude],  # Starting point (latitude, longitude)
+                            "targetPosition": [9.9876, 48.4011],  # Ending point (latitude, longitude)
+                            "height": 0.25  # Height of the arc
+                        },
+                        {
+                            "sourcePosition": [9.9876, 48.4011],  # Starting point (Ulm)
+                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
+                            "height": 0.25  # Height of the arc
+                        }
+                    ]
+                    # Create the pydeck chart with the ArcLayer
+                    st.pydeck_chart(
+                        pdk.Deck(
+                            map_style=None,
+                            initial_view_state=pdk.ViewState(
+                                latitude=centerLongitude,
+                                longitude=centerLatitude,
+                                zoom=zoom_level,  # Set the zoom level here
+                                pitch=50,
+                            ),
+                            layers=[
+                                pdk.Layer(
+                                    "ArcLayer",
+                                    data=arc_data,
+                                    get_source_position="sourcePosition",
+                                    get_target_position="targetPosition",
+                                    get_source_color=[0, 255, 30, 100],  # Green color for the source
+                                    get_target_color=[255, 30, 30, 140],  # Red color for the target
+                                    get_width=5,
+                                    get_height="height",  # Set the height of the arc
+                                ),
+                            ],
+                        ),
+                        use_container_width=True
+                    )
+
+
 
     with col3:
         #this is the right side of screen.
@@ -194,8 +375,6 @@ f"""
     with col2:
 
 
-        #set zoom level
-        zoom_level = 7
 
 
         # Define the data for the ArcLayer
@@ -207,10 +386,6 @@ f"""
             }
         ]
 
-
-        # Calculate the center of the source and target
-        centerLatitude = (sourceLatitude + targetLatitude) / 2
-        centerLongitude = (sourceLongitude + targetLongitude) / 2
 
 
         # Define the data for the TextLayer
@@ -283,7 +458,13 @@ f"""
         )
 
 
-    col10, col11,col12,col13 = st.columns([1,6,8,1])
+    col10, col11,col12,col13 = st.columns([2,9,9,1])
+
+    with col10:
+        #car selection:
+        st.header("Cars:")
+        #radio button for car selection
+        carSelection = st.radio("Select Car", ["Suzuki Swift 2021", "Kia Seltos 2022"])
     
     with col11:
         # auto play mkv file:
@@ -292,163 +473,75 @@ f"""
         #st.video(video_bytes, start_time=0, loop=True, format='video/mp4')#www.cartrade.com
         #video_file.close()
 
-        #open gif carSpinning.gif
-        st.image("carSpinning.gif")
+        if carSelection == "Suzuki Swift 2021":
+            #open gif carSpinning.gif
+            st.header("Recommended Car for Journey:")
+            st.image("carSpinning.gif")
+        else:
+            #open gif carSpinning2.gif
+            st.header("Recommended Car for Journey:")
+            st.image("car2.gif")
 
     with col12:
-        st.write("Get suggestions with the extra kilometers you have included in your rental:")
-        #center items in class="st-emotion-cache-1rsyhoq e1nzilvr5"
-        #st.markdown('<style>.st-emotion-cache-1rsyhoq.e1nzilvr5 {display: flex;justify-content: center;align-items: center;}</style>', unsafe_allow_html=True)
+        if carSelection == "Suzuki Swift 2021":
+            st.header("Car Stats:")
+            col15, col16 = st.columns([1,1])
+            from streamlit_extras.metric_cards import style_metric_cards
+            col15.metric("100Km with⛽", f" 8.5 liters", delta=None)
+            col16.metric("Fuel Type🚂", "Gas", delta=None)
+            style_metric_cards()
+            col17, col18 = st.columns([1,1])
+            col17.metric("Seats🪑", "4", delta=None)
+            col18.metric("Max Fuel Cost💸", f"{distance2*0.5:.1f} EUR", delta=None)
+            style_metric_cards()
+            col19, col20 = st.columns([1,1])
+            col19.metric("Vollkasko🛡️", "Yes", delta=None)
+            col20.metric("Navigation🧭", "No", delta=None)
+        else:
+            st.header("Car Stats:")
+            col15, col16 = st.columns([1,1])
+            from streamlit_extras.metric_cards import style_metric_cards
+            col15.metric("100Km with⛽", f" 6.5 liters", delta=None)
+            col16.metric("Fuel Type🚂", "Diesel", delta=None)
+            style_metric_cards()
+            col17, col18 = st.columns([1,1])
+            col17.metric("Seats🪑", "5", delta=None)
+            col18.metric("Max Fuel Cost💸", f"{distance2*0.38:.1f} EUR", delta=None)
+            style_metric_cards()
+            col19, col20 = st.columns([1,1])
+            col19.metric("Vollkasko🛡️", "Yes", delta=None)
+            col20.metric("Navigation🧭", "Yes", delta=None)
 
-        #adding buttons of cities to visit with distances:
-        col14, col15, col16 = st.columns(3)
-        #making divs with class="stColumn st-emotion-cache-1r6slb0 e1f1d6gn3" have centered elements
-        st.markdown('<style>.stColumn.st-emotion-cache-1r6slb0.e1f1d6gn3 {display: flex;justify-content: center;align-items: center;}</style>', unsafe_allow_html=True)
-        with col14:
-            #location of Stuttgart: 48.7758° N, 9.1829° E
-            distanceToSTG = ((sourceLatitude - 9.1829)**2 + (sourceLongitude - 48.7758)**2)**0.5
-            distanceToSTG = distanceToSTG * 111.32
-            st.write(f"Distance to Stuttgart: `{distanceToSTG:.1f}` km")
-            if True:
-                with st.popover("Stuttgart"):
-                    st.write("Stuttgart is the capital and largest city of the German state of Baden-Württemberg. It is located on the Neckar river in a fertile valley known as the Stuttgart Cauldron. It lies an hour from the Swabian Jura and the Black Forest. Its urban area has a population of 634,830, making it the sixth largest city in Germany.")
-                    #open a popup with arc from source to Stuttgart
-
-                    #Define the data for the ArcLayer
-                    arc_data = [
-                        {
-                            "sourcePosition": [sourceLatitude, sourceLongitude],  # Starting point (latitude, longitude)
-                            "targetPosition": [9.1829, 48.7758],  # Ending point (latitude, longitude)
-                            "height": 0.25  # Height of the arc
-                        },
-                        {
-                            "sourcePosition": [9.1829, 48.7758],  # Starting point (Stuttgart)
-                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
-                            "height": 0.25  # Height of the arc
-                        }
-                    ]
-                    # Create the pydeck chart with the ArcLayer
-                    st.pydeck_chart(
-                        pdk.Deck(
-                            map_style=None,
-                            initial_view_state=pdk.ViewState(
-                                latitude=centerLongitude,
-                                longitude=centerLatitude,
-                                zoom=zoom_level,  # Set the zoom level here
-                                pitch=50,
-                            ),
-                            layers=[
-                                pdk.Layer(
-                                    "ArcLayer",
-                                    data=arc_data,
-                                    get_source_position="sourcePosition",
-                                    get_target_position="targetPosition",
-                                    get_source_color=[0, 255, 30, 100],  # Green color for the source
-                                    get_target_color=[255, 30, 30, 140],  # Red color for the target
-                                    get_width=5,
-                                    get_height="height",  # Set the height of the arc
-                                ),
-                            ],
-                        ),
-                        use_container_width=True
-                    )
-
-        with col15:
-            #location of Nuremberg: 49.4520° N, 11.0768° E
-            distanceToNUE = ((sourceLatitude - 11.0768)**2 + (sourceLongitude - 49.4520)**2)**0.5
-            distanceToNUE = distanceToNUE * 111.32
-            st.write(f"Distance to Nuremberg: `{distanceToNUE:.1f}` km")
-            if True:
-                with st.popover("Nuremberg"):
-                    st.write("Nuremberg is the second-largest city of the German federal state of Bavaria after its capital Munich, and its 518,370 (2019) inhabitants make it the 14th largest city in Germany. On the Pegnitz River (from its confluence with the Rednitz in Fürth onwards: Regnitz, a tributary of the River Main), it lies in the Rhine-Main-Danube Region and is the largest city in Franconia.")
-                    #open a popup with arc from source to Nuremberg
-
-                    #Define the data for the ArcLayer
-                    arc_data = [
-                        {
-                            "sourcePosition": [sourceLatitude, sourceLongitude],  # Starting point (latitude, longitude)
-                            "targetPosition": [11.0768, 49.4520],  # Ending point (latitude, longitude)
-                            "height": 0.25  # Height of the arc
-                        },
-                        {
-                            "sourcePosition": [11.0768, 49.4520],  # Starting point (Nuremberg)
-                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
-                            "height": 0.25  # Height of the arc
-                        }
-                    ]
-                    # Create the pydeck chart with the ArcLayer
-                    st.pydeck_chart(
-                        pdk.Deck(
-                            map_style=None,
-                            initial_view_state=pdk.ViewState(
-                                latitude=centerLongitude,
-                                longitude=centerLatitude,
-                                zoom=zoom_level,  # Set the zoom level here
-                                pitch=50,
-                            ),
-                            layers=[
-                                pdk.Layer(
-                                    "ArcLayer",
-                                    data=arc_data,
-                                    get_source_position="sourcePosition",
-                                    get_target_position="targetPosition",
-                                    get_source_color=[0, 255, 30, 100],  # Green color for the source
-                                    get_target_color=[255, 30, 30, 140],  # Red color for the target
-                                    get_width=5,
-                                    get_height="height",  # Set the height of the arc
-                                ),
-                            ],
-                        ),
-                        use_container_width=True
-                    )
-        #now Ulm: 48.4011° N, 9.9876° E
-        with col16:
-            distanceToULM = ((sourceLatitude - 9.9876)**2 + (sourceLongitude - 48.4011)**2)**0.5
-            distanceToULM = distanceToULM * 111.32
-            st.write(f"Distance to Ulm: `{distanceToULM:.1f}` km")
-            if True:
-                with st.popover("Ulm"):
-                    st.write("Ulm is a city in the federal German state of Baden-Württemberg, situated on the River Danube. The city, whose population is estimated at 126,000 (2016), forms an urban district of its own (German: Stadtkreis) and is the administrative seat of the Alb-Donau district. Ulm, founded around 850, is rich in history and traditions as a former free imperial city (German: freie Reichsstadt).")
-                    #open a popup with arc from source to Ulm
-
-                    #Define the data for the ArcLayer
-                    arc_data = [
-                        {
-                            "sourcePosition": [sourceLatitude, sourceLongitude],  # Starting point (latitude, longitude)
-                            "targetPosition": [9.9876, 48.4011],  # Ending point (latitude, longitude)
-                            "height": 0.25  # Height of the arc
-                        },
-                        {
-                            "sourcePosition": [9.9876, 48.4011],  # Starting point (Ulm)
-                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
-                            "height": 0.25  # Height of the arc
-                        }
-                    ]
-                    # Create the pydeck chart with the ArcLayer
-                    st.pydeck_chart(
-                        pdk.Deck(
-                            map_style=None,
-                            initial_view_state=pdk.ViewState(
-                                latitude=centerLongitude,
-                                longitude=centerLatitude,
-                                zoom=zoom_level,  # Set the zoom level here
-                                pitch=50,
-                            ),
-                            layers=[
-                                pdk.Layer(
-                                    "ArcLayer",
-                                    data=arc_data,
-                                    get_source_position="sourcePosition",
-                                    get_target_position="targetPosition",
-                                    get_source_color=[0, 255, 30, 100],  # Green color for the source
-                                    get_target_color=[255, 30, 30, 140],  # Red color for the target
-                                    get_width=5,
-                                    get_height="height",  # Set the height of the arc
-                                ),
-                            ],
-                        ),
-                        use_container_width=True
-                    )
+    if carSelection == "Suzuki Swift 2021":
+        st.header("Overall Trip Details for Suzuki Swift:",divider=True)
+        col30,col31,col32,col33 = st.columns([1,1,1,1])
+        col30.metric("Total Cost💸", f"{cost:.2f} EUR", delta=None)
+        col31.metric("Total Distance Possible📏", f"{approxDistanceBetweenSourceAndTarget:.1f} km", delta=None)
+        def convertDateToDatetime(date):
+            import datetime
+            #remove first 5 characters:
+            #date = date[5:]
+            #st.write(date)
+            #st.write(datetime.datetime.strptime(date, "%H:%M %Y-%m-%d"))
+            return datetime.datetime.strptime(date, "%H:%M %Y-%m-%d")
+        col32.metric("Total Duration of Rental⏳", f"{convertDateToDatetime(return_date) - convertDateToDatetime(pickup_date)}", delta=None)
+        with col33:
+            st.button("Book Now🚗💨",use_container_width=True)
+    else:
+        st.header("Overall Trip Details for Kia Seltos:",divider=True)
+        col30,col31,col32,col33 = st.columns([1,1,1,1])
+        col30.metric("Total Cost💸", f"{cost:.2f} EUR", delta=None)
+        col31.metric("Total Distance Possible📏", f"{approxDistanceBetweenSourceAndTarget:.1f} km", delta=None)
+        def convertDateToDatetime(date):
+            import datetime
+            #remove first 5 characters:
+            #date = date[5:]
+            #st.write(date)
+            #st.write(datetime.datetime.strptime(date, "%H:%M %Y-%m-%d"))
+            return datetime.datetime.strptime(date, "%H:%M %Y-%m-%d")
+        col32.metric("Total Duration of Rental⏳", f"{convertDateToDatetime(return_date) - convertDateToDatetime(pickup_date)}", delta=None)
+        with col33:
+            st.button("Book Now🚗💨",use_container_width=True)
 
 if __name__ == "__main__":
     sourceLatitude = 11.5820
