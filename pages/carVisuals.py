@@ -27,14 +27,30 @@ def main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude,depart
     with open(jsonFile) as file:
         data = json.load(file)
         tripData = data[0]
+
+    #check if state variables are set:
+
+
+
+
+    if st.session_state["pickup_location"] is None:
+        pickup_location = "Munich"
+        return_location = "Heilbronn"
+    else:
+        sourceLatitude = st.session_state["pickupLongitude"]
+        sourceLongitude = st.session_state["pickupLatitude"]
+        targetLatitude = st.session_state["returnLongitude"]
+        targetLongitude = st.session_state["returnLatitude"]
+        pickup_location = st.session_state["pickup_location"]
+        return_location = st.session_state["return_location"]
+
+
     # Calculate the radius of the circles to be drawn by checking the distance between the two points
     distance = ((sourceLatitude - targetLatitude)**2 + (sourceLongitude - targetLongitude)**2)**0.5
     radius = distance * 1500
 
 
     distance2 = distance * 111.32
-    pickup_location = "Munich"
-    return_location = "Heilbronn"
     pickup_date = tripData.get("StartTimestamp")
     #remove last 10 characters from the string to get the date
     pickup_date = pickup_date[:-10]

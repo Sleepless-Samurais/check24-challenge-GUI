@@ -2,6 +2,8 @@ import streamlit as st
 import pydeck
 import pandas as pd
 
+st.set_page_config(initial_sidebar_state="collapsed",layout="wide")
+
 cities = {
     "München": {"latitude": 48.1351, "longitude": 11.5820},
     "Heilbronn": {"latitude": 49.1427, "longitude": 9.2109},
@@ -104,8 +106,8 @@ cities = {
 cities = pd.DataFrame(cities.items(), columns=["Capital", "coordinates"])
 cities[["Latitude", "Longitude"]] = pd.DataFrame(cities["coordinates"].tolist(), index=cities.index)
 #adding a size column to the cities dataframe
-cities["size"] = 4000
-st.write(cities)
+cities["size"] = 5000
+#st.write(cities)
 
 
 
@@ -139,10 +141,17 @@ try:
 except :
     selectedCities = []
 
-st.write(selectedCities)
+#st.write(selectedCities)
 
 st.markdown('<style>.mapboxgl-ctrl-bottom-right{display: none;}</style>', unsafe_allow_html=True)
 
+col1, col2 = st.columns([2, 2])
+with col1:
+    st.write("Starting City:")
+    selectedCities[0]["Capital"] if len(selectedCities) > 0 else "None"
+with col2:
+    st.write("Destination City:")
+    selectedCities[1]["Capital"] if len(selectedCities) > 1 else "None"
 
 with st.popover("View Connection"):
     # Define the coordinates for first two selected cities:
@@ -172,3 +181,18 @@ with st.popover("View Connection"):
             tooltip={"text": "{Capital}\n{Latitude}, {Longitude}"},
         )
         st.pydeck_chart(chart3)
+
+if st.button("Show Cars"):
+    if len(selectedCities) == 2:
+        st.write(f"Searching cars for pick-up at {selectedCities[0]['Capital']} and return at {selectedCities[1]['Capital']}")
+        import MainSite
+        st.session_state["pickup_location"] = selectedCities[0]['Capital']
+        st.session_state["pickupLatitude"] = selectedCities[0]['Latitude']
+        st.session_state["pickupLongitude"] = selectedCities[0]['Longitude']
+        st.session_state["return_location"] = selectedCities[1]['Capital']
+        st.session_state["returnLatitude"] = selectedCities[1]['Latitude']
+        st.session_state["returnLongitude"] = selectedCities[1]['Longitude']
+        MainSite.nav_page("carVisuals", 10)
+    else:
+        st.write("Please select two cities to show cars")
+
