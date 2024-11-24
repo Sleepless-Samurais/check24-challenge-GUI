@@ -20,15 +20,16 @@ if "done_init" not in st.session_state:
     )
 
 cities = {
-    "München": {"latitude": 48.1351, "longitude": 11.5820},
+    "Garching bei München": {"latitude": 48.2496, "longitude": 11.6584},
+    "Würzburg": {"latitude": 49.7913, "longitude": 9.9534},
     "Heilbronn": {"latitude": 49.1427, "longitude": 9.2109},
+    "München": {"latitude": 48.1351, "longitude": 11.5820},
     "Augsburg": {"latitude": 48.3705, "longitude": 10.8978},
     "Nuremberg": {"latitude": 49.4521, "longitude": 11.0767},
     "Stuttgart": {"latitude": 48.7758, "longitude": 9.1829},
     "Regensburg": {"latitude": 49.0134, "longitude": 12.1016},
     "Ingolstadt": {"latitude": 48.7651, "longitude": 11.4237},
     "Ulm": {"latitude": 48.4011, "longitude": 9.9876},
-    "Würzburg": {"latitude": 49.7913, "longitude": 9.9534},
     "Erlangen": {"latitude": 49.5897, "longitude": 11.0049},
     "Bamberg": {"latitude": 49.8988, "longitude": 10.9028},
     "Schweinfurt": {"latitude": 50.0489, "longitude": 10.2217},
