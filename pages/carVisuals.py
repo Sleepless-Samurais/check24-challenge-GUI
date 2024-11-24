@@ -56,17 +56,17 @@ def main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude,depart
 
 
     distance2 = distance * 111.32
-    pickup_date = tripData.get("StartTimestamp")
+    # pickup_date = tripData.get("StartTimestamp")
     #remove last 10 characters from the string to get the date
-    pickup_date = pickup_date[:-10]
-    return_date = tripData.get("EndTimestamp")
-    return_date = return_date[:-10]
+    # pickup_date = pickup_date[:-10]
+    # return_date = tripData.get("EndTimestamp")
+    # return_date = return_date[:-10]
     approxDistanceBetweenSourceAndTarget = distance2
     #remove unnecessary numbers after dots of float
         
     coveredDistance = tripData.get("FreeKilometers")
     leftDistance = coveredDistance - approxDistanceBetweenSourceAndTarget
-    cost = tripData.get("Price")
+    cost = tripData.get("Price")*0.01
 
     with col3:
         #this is the right side of screen.
@@ -293,7 +293,7 @@ f"""
         #video_file.close()
 
         #open gif carSpinning.gif
-        st.image("carSpinning.gif", use_column_width=True)
+        st.image("carSpinning.gif")
 
     with col12:
         st.write("Get suggestions with the extra kilometers you have included in your rental:")
@@ -449,11 +449,6 @@ f"""
                         ),
                         use_container_width=True
                     )
-
-                    
-
-        
-
 
 if __name__ == "__main__":
     sourceLatitude = 11.5820
