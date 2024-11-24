@@ -43,6 +43,11 @@ def main(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude,depart
         targetLongitude = st.session_state["returnLatitude"]
         pickup_location = st.session_state["pickup_location"]
         return_location = st.session_state["return_location"]
+        pickup_date = st.session_state["pickup_date"]
+        return_date = st.session_state["return_date"]
+        pickup_date = str(st.session_state["pickup_time"])+" "+str(pickup_date)
+        return_date = str(st.session_state["return_time"])+" "+str(return_date)
+        
 
 
     # Calculate the radius of the circles to be drawn by checking the distance between the two points
@@ -166,7 +171,7 @@ f"""
     </div>
     <div class="box" data-hover-text="">
       <div class="icon">📏</div>
-      <div class="label">Distance: {approxDistanceBetweenSourceAndTarget} km</div>
+      <div class="label">Distance: {approxDistanceBetweenSourceAndTarget:.1f} km</div>
     </div>
     <div class="box" data-hover-text="">
       <div class="icon">📶</div>
@@ -174,7 +179,7 @@ f"""
     </div>
     <div class="box" data-hover-text="Distance left after the trip">
       <div class="icon">➖</div>
-      <div class="label">Left Distance: {leftDistance} km</div>
+      <div class="label">Left Distance: {leftDistance:.1f} km</div>
     </div>
     <div class="box" data-hover-text="View trip cost details">
       <div class="icon">💰</div>
@@ -212,12 +217,12 @@ f"""
         text_data = [
             {
                 "position": [sourceLatitude, sourceLongitude],  # Source position
-                "text": departureDate,
+                "text": pickup_date,
                 "color": [40, 255, 140,245],  # Green color
             },
             {
                 "position": [targetLatitude, targetLongitude],  # Target position
-                "text": returnDate,
+                "text": return_date,
                 "color": [255, 30, 30,245],  # Red color
             }
         ]
@@ -303,7 +308,7 @@ f"""
             #location of Stuttgart: 48.7758° N, 9.1829° E
             distanceToSTG = ((sourceLatitude - 9.1829)**2 + (sourceLongitude - 48.7758)**2)**0.5
             distanceToSTG = distanceToSTG * 111.32
-            st.write("Distance to Stuttgart:", distanceToSTG,"km")
+            st.write(f"Distance to Stuttgart: `{distanceToSTG:.1f}` km")
             if True:
                 with st.popover("Stuttgart"):
                     st.write("Stuttgart is the capital and largest city of the German state of Baden-Württemberg. It is located on the Neckar river in a fertile valley known as the Stuttgart Cauldron. It lies an hour from the Swabian Jura and the Black Forest. Its urban area has a population of 634,830, making it the sixth largest city in Germany.")
@@ -318,7 +323,7 @@ f"""
                         },
                         {
                             "sourcePosition": [9.1829, 48.7758],  # Starting point (Stuttgart)
-                            "targetPosition": [9.2219, 49.1427],  # Ending point (Heilbronn)
+                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
                             "height": 0.25  # Height of the arc
                         }
                     ]
@@ -352,7 +357,7 @@ f"""
             #location of Nuremberg: 49.4520° N, 11.0768° E
             distanceToNUE = ((sourceLatitude - 11.0768)**2 + (sourceLongitude - 49.4520)**2)**0.5
             distanceToNUE = distanceToNUE * 111.32
-            st.write("Distance to Nuremberg:", distanceToNUE,"km")
+            st.write(f"Distance to Nuremberg: `{distanceToNUE:.1f}` km")
             if True:
                 with st.popover("Nuremberg"):
                     st.write("Nuremberg is the second-largest city of the German federal state of Bavaria after its capital Munich, and its 518,370 (2019) inhabitants make it the 14th largest city in Germany. On the Pegnitz River (from its confluence with the Rednitz in Fürth onwards: Regnitz, a tributary of the River Main), it lies in the Rhine-Main-Danube Region and is the largest city in Franconia.")
@@ -367,7 +372,7 @@ f"""
                         },
                         {
                             "sourcePosition": [11.0768, 49.4520],  # Starting point (Nuremberg)
-                            "targetPosition": [9.2219, 49.1427],  # Ending point (Heilbronn)
+                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
                             "height": 0.25  # Height of the arc
                         }
                     ]
@@ -400,7 +405,7 @@ f"""
         with col16:
             distanceToULM = ((sourceLatitude - 9.9876)**2 + (sourceLongitude - 48.4011)**2)**0.5
             distanceToULM = distanceToULM * 111.32
-            st.write("Distance to Ulm:", distanceToULM,"km")
+            st.write(f"Distance to Ulm: `{distanceToULM:.1f}` km")
             if True:
                 with st.popover("Ulm"):
                     st.write("Ulm is a city in the federal German state of Baden-Württemberg, situated on the River Danube. The city, whose population is estimated at 126,000 (2016), forms an urban district of its own (German: Stadtkreis) and is the administrative seat of the Alb-Donau district. Ulm, founded around 850, is rich in history and traditions as a former free imperial city (German: freie Reichsstadt).")
@@ -415,7 +420,7 @@ f"""
                         },
                         {
                             "sourcePosition": [9.9876, 48.4011],  # Starting point (Ulm)
-                            "targetPosition": [9.2219, 49.1427],  # Ending point (Heilbronn)
+                            "targetPosition": [targetLatitude, targetLongitude],  # Ending point (chosen destination)
                             "height": 0.25  # Height of the arc
                         }
                     ]

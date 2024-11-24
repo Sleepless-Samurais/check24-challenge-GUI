@@ -29,17 +29,22 @@ def nav_page(page_name, timeout_secs=3):
 
 
 #this is the main site of the application for the rental car GUI
-st.set_page_config(initial_sidebar_state="collapsed",layout="wide")
-st.markdown(
-    """
-<style>
-    .st-emotion-cache-yfhhig.ef3psqc5 {
-        display: none;
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
+if "done_init" not in st.session_state:
+    st.session_state["done_init"] = True
+    st.set_page_config(
+        initial_sidebar_state="collapsed",
+        layout="wide"
+    )
+    st.markdown(
+        """
+    <style>
+        .st-emotion-cache-yfhhig.ef3psqc5 {
+            display: none;
+        }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
 
 def main():
     st.markdown("<h1 style='text-align: center;'>Rent a Car at hackatum Check24 Challenge</h1>", unsafe_allow_html=True)
