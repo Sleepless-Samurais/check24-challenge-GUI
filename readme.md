@@ -4,6 +4,8 @@ This is our award winning vision of providing users with new experiences when re
 
 ![Screenshot 2024-11-25 121903](https://github.com/user-attachments/assets/5f3f27e6-c727-4fed-8e63-cc864301443c)
 
+[link to Devpost](https://devpost.com/software/sleepless-24-7)
+
 
 ### To run this website you need to install python(3.10.0+)
 First install Streamlit:
