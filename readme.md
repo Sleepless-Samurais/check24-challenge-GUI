@@ -1,6 +1,9 @@
 # SleeplessSamurais Check24 competition GUI idea prototype
 
-This is our vision of providing users with new experiences when renting cars
+This is our award winning vision of providing users with new experiences when renting cars
+
+![Screenshot 2024-11-25 121903](https://github.com/user-attachments/assets/5f3f27e6-c727-4fed-8e63-cc864301443c)
+
 
 ### To run this website you need to install python(3.10.0+)
 First install Streamlit:
