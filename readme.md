@@ -6,6 +6,10 @@ This is our award winning vision of providing users with new experiences when re
 
 [link to Devpost](https://devpost.com/software/sleepless-24-7)
 
+# Our team:
+
+![groupPhoto](https://github.com/user-attachments/assets/6f997604-a654-46ce-9453-b796bf9c1e67)
+
 
 ### To run this website you need to install python(3.10.0+)
 First install Streamlit:
